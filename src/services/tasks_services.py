@@ -13,9 +13,9 @@ class TasksService:
         task = await  task_repository.create_task(data)
         return task
 
-    async def get_tasks(self,data:UpdateTasks,db_session:AsyncSession):
+    async def update_tasks(self,data:UpdateTasks,db_session:AsyncSession):
         task_repository= TasksRepository(db_session)
-        task = await task_repository.get_tasks(data)
+        task = await task_repository.update_tasks(data)
         return task
 
     async def delete_task(self,  task_id, db_session:AsyncSession):

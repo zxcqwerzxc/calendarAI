@@ -3,10 +3,12 @@ from typing import Optional
 
 class CreateUsers(BaseModel):
     login: str
-    password: str
+    password: int
 
 class UpdateUsers(BaseModel):
+    id: int
     login: Optional[str]= None
-    password: Optional[str] =None
+    password: Optional[int] =None
+
 
 

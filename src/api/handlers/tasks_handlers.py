@@ -19,17 +19,17 @@ async def create_task(
 
 
 
-@task_router.put('/', summary='Обновить задание')
+@task_router.put('/task_id', summary='Обновить задание')
 async def get_tasks(
         body: UpdateTasks,
         service: TasksService= Depends(),
         db:AsyncSession= Depends(get_db)
 ):
- await service.get_tasks(body,db)
+ await service.update_tasks(body,db)
  return MessageResponse(message='Задание успешно получено')
 
 
-@task_router.delete('/', summary="Удалить задачу")
+@task_router.delete('/task_id', summary="Удалить задачу")
 async def delete_tasks(
         task_id: int,
         service: TasksService = Depends(),

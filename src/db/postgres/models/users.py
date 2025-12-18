@@ -14,5 +14,5 @@ class Users(Base):
 
     id:Mapped[int]=mapped_column(primary_key=True,autoincrement=True)
     login:Mapped[str]= mapped_column(comment="логин пользователя")
-    password:Mapped[str]= mapped_column(comment="пароль пользователя")
+    password:Mapped[int]= mapped_column(comment="пароль пользователя")
 

@@ -12,6 +12,7 @@ class CreateTasks(BaseModel):
     priority: Optional[int]= None
 
 class UpdateTasks(BaseModel):
+    id: int
     description: Optional[str]= None
     status: Optional[bool]= None
     title:  Optional[str] = None
