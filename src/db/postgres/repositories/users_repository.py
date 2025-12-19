@@ -32,6 +32,17 @@ class UsersRepository:
             await self._session.commit()
             await self._session.refresh(user)
 
+    async def get_user(self, user_id):
+        query = (
+            select(Users)
+            .where(Users.id == user_id)
+        )
+        result = await self._session.execute(query)
+        user = result.scalar_one_or_none()
+
+        return user
+
+
 async def delete_users(self, user_id):
         query = (
             delete(Users)

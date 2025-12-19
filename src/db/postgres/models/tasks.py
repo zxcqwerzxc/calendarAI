@@ -18,3 +18,4 @@ class Tasks(Base):
     due_date:Mapped[datetime]= mapped_column(comment="время конца задачи")
     created_at:Mapped[datetime]= mapped_column(comment="время начала задачи")
     priority:Mapped[int]= mapped_column(comment="приоритет задачи")
+    task_date:Mapped[datetime]= mapped_column(comment="Задачи на день")

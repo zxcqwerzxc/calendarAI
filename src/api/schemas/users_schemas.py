@@ -10,5 +10,9 @@ class UpdateUsers(BaseModel):
     login: Optional[str]= None
     password: Optional[int] =None
 
+class GetUser(BaseModel):
+    id: int
+    login: Optional[str] = None
+    password: Optional[int] = None
 
 

@@ -1,4 +1,4 @@
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, and_
 
 from contextlib import AbstractContextManager
 from typing import Callable
@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from src.api.schemas.tasks_schemas import CreateTasks
 from src.db.postgres.models.tasks import Tasks
 from src.db.postgres.models.users import Users
+from datetime import datetime
 
 
 class TasksRepository:
@@ -29,8 +30,8 @@ class TasksRepository:
         await self._session.refresh(new_task)
         return new_task
 
-    async def update_tasks(self, data):
-        stmt= select(Tasks).where(Tasks.id == data.id)
+    async def update_tasks(self, task_id, data):
+        stmt = select(Tasks).where(Tasks.id == task_id)
         result = await self._session.execute(stmt)
         task = result.scalars().first()
 
@@ -45,8 +46,7 @@ class TasksRepository:
                 task.due_date = data.due_date
             if data.priority is not None:
                 task.priority = data.priority
-                await self._session.commit()
-
+            await self._session.commit()
 
     async def delete_tasks(self, task_id):
         query = (
@@ -55,3 +55,23 @@ class TasksRepository:
         )
         await self._session.execute(query)
         await self._session.commit()
+
+    async def get_task(self, task_id):
+        query = (
+            select(Tasks)
+            .where(Tasks.id == task_id)
+        )
+        result = await self._session.execute(query)
+        task = result.scalar_one_or_none()
+
+        return task
+
+    async def get_tasks(self, date_from: datetime, date_to: datetime):
+        query = (
+            select(Tasks)
+            .where(
+                and_(Tasks.task_date >= date_from, Tasks.task_date <= date_to))
+        )
+        result = await self._session.execute(query)
+        tasks = result.scalars().all()
+        return tasks

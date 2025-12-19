@@ -2,7 +2,7 @@ from functools import wraps
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.api.schemas.tasks_schemas import CreateTasks, UpdateTasks
+from src.api.schemas.tasks_schemas import CreateTasks, UpdateTasks, GetTask, GetTasks, GetShortedTask
 from src.db.postgres.repositories.tasks_repository import TasksRepository
 
 
@@ -13,11 +13,42 @@ class TasksService:
         task = await  task_repository.create_task(data)
         return task
 
-    async def update_tasks(self,data:UpdateTasks,db_session:AsyncSession):
-        task_repository= TasksRepository(db_session)
-        task = await task_repository.update_tasks(data)
+    async def update_tasks(self, task_id, data: UpdateTasks, db_session: AsyncSession):
+        task_repository = TasksRepository(db_session)
+        task = await task_repository.update_tasks(task_id, data)
         return task
 
-    async def delete_task(self,  task_id, db_session:AsyncSession):
+    async def delete_task(self, task_id, db_session: AsyncSession):
         task_repository = TasksRepository(db_session)
         task = await task_repository.delete_tasks(task_id)
+
+    async def get_task(self, task_id, db_session: AsyncSession):
+        task_repository = TasksRepository(db_session)
+        task_data = await task_repository.get_task(task_id)
+
+        return GetTask(
+            id=task_data.id,
+            description=task_data.description,
+            status=task_data.status,
+            title=task_data.title,
+            due_date=task_data.due_date,
+            created_at=task_data.created_at,
+            priority=task_data.priority
+        )
+
+    async def get_tasks(self, db_session: AsyncSession, date_from, date_to):
+        task_repository = TasksRepository(db_session)
+        task_data = await task_repository.get_tasks(date_from, date_to)
+
+        return GetTasks(
+            tasks=[
+                GetShortedTask(
+                    task_date=task.task_date,
+                    title=task.title,
+                    due_date=task.due_date,
+                    created_at=task.created_at,
+                    priority=task.priority
+                )
+                for task in task_data
+            ]
+        )
