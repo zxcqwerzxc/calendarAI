@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends,HTTPException,Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.handlers.tasks_handlers import task_router
 from src.api.schemas.common_schemas import MessageResponse
 from src.api.schemas.users_schemas import CreateUsers, UpdateUsers
 from src.db.postgres.session import get_db
+from src.services.security import verify_password
 from src.services.tasks_services import TasksService
 from src.services.users_services import UsersService
 
@@ -55,3 +56,33 @@ async def get_task(
         db: AsyncSession = Depends(get_db)
 ):
     return await service.get_user(user_id,db)
+
+
+@user_router.get("/user/auth",
+    summary="Простая аутентификация пользователя (login + password)",)
+async def get_user_auth(
+        login: str = Query(..., description="Логин пользователя"),
+        password: str = Query(..., description="Пароль пользователя"),
+        service: UsersService = Depends(),
+        db: AsyncSession = Depends(get_db)
+):
+    user = await service.authenticate(db, login,password)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Пользователь с таким логином не найден"
+        )
+
+    if not verify_password(password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Неверный пароль"
+        )
+
+    return {
+        "status": "ok",
+        "message": "Аутентификация успешна",
+        "user_id": user.id,
+        "login": user.login
+    }
