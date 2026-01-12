@@ -10,8 +10,8 @@ class UsersRepository:
 
     async def create_users(self, data):
         new_user = Users(
-            login=data.login,
-            password=data.password
+            login=data["login"],
+            password=data["password"]
         )
         self._session.add(new_user)
         await self._session.commit()
@@ -29,8 +29,8 @@ class UsersRepository:
             if data.password is not None:
                 user.password = data.password
 
-            await self._session.commit()
-            await self._session.refresh(user)
+        await self._session.commit()
+        await self._session.refresh(user)
 
     async def get_user(self, user_id):
         query = (
@@ -42,8 +42,7 @@ class UsersRepository:
 
         return user
 
-
-async def delete_users(self, user_id):
+    async def delete_users(self, user_id):
         query = (
             delete(Users)
             .where(Users.id == user_id)

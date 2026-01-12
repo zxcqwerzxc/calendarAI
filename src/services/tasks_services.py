@@ -1,5 +1,3 @@
-from functools import wraps
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.schemas.tasks_schemas import CreateTasks, UpdateTasks, GetTask, GetTasks, GetShortedTask
@@ -10,7 +8,7 @@ class TasksService:
 
     async def create_tasks(self, data: CreateTasks, db_session: AsyncSession):
         task_repository = TasksRepository(db_session)
-        task = await  task_repository.create_task(data)
+        task = await task_repository.create_task(data)
         return task
 
     async def update_tasks(self, task_id, data: UpdateTasks, db_session: AsyncSession):
@@ -36,16 +34,16 @@ class TasksService:
             priority=task_data.priority
         )
 
-    async def get_tasks(self, db_session: AsyncSession, date_from, date_to):
+    async def get_tasks(self, db_session: AsyncSession, date_from, date_to, user_id):
         task_repository = TasksRepository(db_session)
-        task_data = await task_repository.get_tasks(date_from, date_to)
+        task_data = await task_repository.get_tasks(date_from, date_to, user_id)
 
         return GetTasks(
             tasks=[
                 GetShortedTask(
+                    id=task.id,
                     task_date=task.task_date,
                     title=task.title,
-                    due_date=task.due_date,
                     created_at=task.created_at,
                     priority=task.priority
                 )

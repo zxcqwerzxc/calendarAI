@@ -11,21 +11,33 @@ from src.db.postgres.models.tasks import Tasks
 from src.db.postgres.models.users import Users
 from datetime import datetime
 
+from src.db.postgres.models.users_tasks import UsersTasks
+
 
 class TasksRepository:
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
     async def create_task(self, data):
-        new_task = Tasks(
+        new_task=Tasks(
             description=data.description,
-            status=data.status,
+            status=data.status or False,
             title=data.title,
-            due_date=data.due_date,
+            due_time=data.due_time,
             created_at=data.created_at,
-            priority=data.priority
+            priority=data.priority,
+            task_date=data.task_date,
         )
         self._session.add(new_task)
+        await self._session.commit()
+        await self._session.refresh(new_task)
+
+        link = UsersTasks(
+            user_id=data.user_id,
+            task_id=new_task.id
+        )
+        self._session.add(link)
+
         await self._session.commit()
         await self._session.refresh(new_task)
         return new_task
@@ -42,8 +54,8 @@ class TasksRepository:
                 task.status = data.status
             if data.title is not None:
                 task.title = data.title
-            if data.due_date is not None:
-                task.due_date = data.due_date
+            if data.due_time is not None:
+                task.due_time = data.due_time
             if data.priority is not None:
                 task.priority = data.priority
             await self._session.commit()
@@ -66,11 +78,17 @@ class TasksRepository:
 
         return task
 
-    async def get_tasks(self, date_from: datetime, date_to: datetime):
+    async def get_tasks(self, date_from: datetime, date_to: datetime, user_id: int):
         query = (
             select(Tasks)
+            .join(UsersTasks, UsersTasks.task_id == Tasks.id)
             .where(
-                and_(Tasks.task_date >= date_from, Tasks.task_date <= date_to))
+                and_(
+                    Tasks.task_date >= date_from,
+                     Tasks.task_date <= date_to,
+                    UsersTasks.user_id == user_id
+                )
+            )
         )
         result = await self._session.execute(query)
         tasks = result.scalars().all()
