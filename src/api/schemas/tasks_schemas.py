@@ -34,7 +34,7 @@ class GetShortedTask(BaseModel):
     id: int
     title: Optional[str] = None
     priority: Optional[int] = None
-    created_at: Optional[datetime] = None
+    task_time: Optional[datetime] = None
     task_date: Optional[date] = None
 
 

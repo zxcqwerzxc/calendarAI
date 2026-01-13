@@ -18,7 +18,7 @@ async def create_params(
     await service.upsert_params(body,db)
     return MessageResponse(message="Параметр успешно создан")
 
-@params_router.get('/{params_id}', summary="Получить параметр")
+@params_router.get('', summary="Получить параметр")
 async def get_task(
         user_id: int,
         service: ParamsService = Depends(),
