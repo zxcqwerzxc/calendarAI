@@ -7,8 +7,14 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 from langchain_postgres import PostgresChatMessageHistory
+from sqlalchemy import delete
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.testing.pickleable import User
 
+from src.api.schemas.chats_schemas import MessageItem
 from src.config import OPENAI_API_BASE, OPENROUTER_LLM_MODEL, OPENAI_API_KEY, POSTGRES_URL
+from src.db.postgres.models.messages import Messages
+from src.db.postgres.repositories.chats_repository import MessagesRepository
 
 
 class ChatsService:
@@ -25,7 +31,7 @@ class ChatsService:
             sync_connection=sync_connection
         )
 
-        messages = chat_history.messages
+        messages = chat_history.get_messages()
 
         prompt = ("ты мой друг собутыльник который живут "
                   "ради водки, придерживайся постоянно этой роли в разговоре со мной"
@@ -58,3 +64,30 @@ class ChatsService:
         sync_connection.close()
 
         return ai_response.content
+
+    async def get_chat_messages(self, user_id: int) -> list[MessageItem]:
+        conn_info = POSTGRES_URL.replace("+asyncpg", "")
+        with psycopg.connect(conn_info) as conn:
+            history = PostgresChatMessageHistory(
+                "messages",  # table_name — только позиционно
+                str(user_id),  # session_id   — только позиционно
+                sync_connection=conn
+            )
+
+            raw_messages = history.messages
+
+        formatted = [
+            MessageItem(
+                role="user" if msg.type == "human" else "ai",
+                content=msg.content
+            )
+            for msg in raw_messages
+        ]
+
+        return formatted
+
+    async def delete_chat_history(self, user_id, db_session: AsyncSession):
+        messages_repository = MessagesRepository(db_session)
+        result = await messages_repository.delete_chat_history(user_id)
+        return result
+
