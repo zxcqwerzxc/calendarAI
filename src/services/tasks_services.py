@@ -50,3 +50,18 @@ class TasksService:
                 for task in task_data
             ]
         )
+
+    async def search_tasks_by_title(self, db_session: AsyncSession, user_id: int, search_query: str, limit: int = 10):
+        task_repository = TasksRepository(db_session)
+        tasks = await task_repository.search_tasks_by_title(user_id, search_query, limit)
+
+        return [GetTask(
+            id=task.id,
+            description=task.description,
+            status=task.status,
+            title=task.title,
+            due_date=task.due_time,  # или task.task_date, в зависимости от модели
+            created_at=task.created_at,
+            priority=task.priority
+        ) for task in tasks]
+

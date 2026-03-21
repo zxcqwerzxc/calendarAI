@@ -93,3 +93,25 @@ class TasksRepository:
         result = await self._session.execute(query)
         tasks = result.scalars().all()
         return tasks
+
+    async def search_tasks_by_title(self, user_id: int, search_query: str, limit: int = 10):
+
+        query = (
+            select(Tasks)
+            .join(UsersTasks, UsersTasks.task_id == Tasks.id)
+            .where(
+                and_(
+                    UsersTasks.user_id == user_id,
+                    Tasks.title.ilike(f'%{search_query}%')
+                )
+            )
+            .limit(limit)
+            .order_by(Tasks.created_at.desc())
+        )
+        result = await self._session.execute(query)
+        tasks = result.scalars().all()
+        return tasks
+
+
+
+

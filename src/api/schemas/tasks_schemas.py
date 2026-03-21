@@ -43,3 +43,19 @@ class GetTasks(BaseModel):
     tasks: Optional[List[GetShortedTask]] = None
 
 
+from pydantic import BaseModel, Field
+from typing import Optional, Literal
+from datetime import date, time
+
+class TaskOut(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    priority: Literal[1, 2, 3]
+    due_date: Optional[date] = None      # если у вас есть отдельно дата
+    due_time: Optional[str] = None        # строка "14:30" или None
+    status: Optional[bool] = None         # завершена / нет
+
+    class Config:
+        from_attributes = True
+

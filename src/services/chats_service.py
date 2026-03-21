@@ -18,7 +18,8 @@ from src.db.postgres.repositories.chats_repository import MessagesRepository
 
 
 class ChatsService:
-    async def generate_message(self, body):
+    async def \
+            generate_message(self, body):
         user_message = body.message
 
         conn_info = POSTGRES_URL.replace("+asyncpg", "")

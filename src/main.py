@@ -6,7 +6,6 @@ from starlette.middleware.cors import CORSMiddleware
 from src.api.handlers.chats_handlers import chat_router
 from src.api.handlers.tasks_handlers import task_router
 from src.api.handlers.users_handlers import user_router
-
 from src.api.handlers.params_handlers import params_router
 
 app = FastAPI(title='Calendar')
@@ -23,13 +22,13 @@ app.add_middleware(
 )
 main_api_router = APIRouter(prefix='/api/v1')
 
-main_api_router.include_router(task_router, prefix='/task', tags=['Задачи'])
-main_api_router.include_router(user_router, prefix='/user', tags=['Пользователи'])
-
+# ИСПРАВЛЕНО: /task -> /tasks, /user -> /users
+main_api_router.include_router(task_router, prefix='/tasks', tags=['Задачи'])
+main_api_router.include_router(user_router, prefix='/users', tags=['Пользователи'])
 main_api_router.include_router(params_router, prefix='/params', tags=['Параметры'])
 main_api_router.include_router(chat_router, prefix='/chat', tags=['Чат'])
+
 app.include_router(main_api_router)
 
 if __name__ == '__main__':
     uvicorn.run(app, host="0.0.0.0")
-
