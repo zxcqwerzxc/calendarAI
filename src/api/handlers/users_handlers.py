@@ -34,7 +34,7 @@ async def upgrade_users(
 
 @user_router.get('/{user_id}', summary= "Получить пользователя")
 async def get_users(
-        user_id: int,
+        user_id: str,
         service: UsersService = Depends(),
         db: AsyncSession = Depends(get_db)
 ):
@@ -54,8 +54,8 @@ async def delete_users(
 @user_router.get("/user/auth",
     summary="Простая аутентификация пользователя (login + password)",)
 async def get_user_auth(
-        login: str = Query(..., description="Логин пользователя"),
-        password: str = Query(..., description="Пароль пользователя"),
+        login: str,
+        password: str,
         service: UsersService = Depends(),
         db: AsyncSession = Depends(get_db)
 ):

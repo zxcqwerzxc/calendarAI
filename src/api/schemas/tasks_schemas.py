@@ -26,6 +26,7 @@ class GetTask(BaseModel):
     description: Optional[str] = None
     status: Optional[bool] = None
     title: Optional[str] = None
+    task_date: Optional[date] = None
     due_time: Optional[time] = None
     created_at: Optional[datetime] = None
     priority: Optional[int] = None

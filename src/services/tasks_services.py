@@ -29,7 +29,8 @@ class TasksService:
             description=task_data.description,
             status=task_data.status,
             title=task_data.title,
-            due_date=task_data.due_date,
+            due_time=task_data.due_time,
+            task_date=task_data.task_date,
             created_at=task_data.created_at,
             priority=task_data.priority
         )
