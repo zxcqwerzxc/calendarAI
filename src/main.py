@@ -1,3 +1,4 @@
+# src/main.py
 import uvicorn
 from fastapi import FastAPI
 from fastapi.routing import APIRouter
@@ -22,8 +23,7 @@ app.add_middleware(
 )
 main_api_router = APIRouter(prefix='/api/v1')
 
-# ИСПРАВЛЕНО: /task -> /tasks, /user -> /users
-main_api_router.include_router(task_router, prefix='/tasks', tags=['Задачи'])
+main_api_router.include_router(task_router, prefix='/task', tags=['Задачи'])
 main_api_router.include_router(user_router, prefix='/users', tags=['Пользователи'])
 main_api_router.include_router(params_router, prefix='/params', tags=['Параметры'])
 main_api_router.include_router(chat_router, prefix='/chat', tags=['Чат'])
